@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer mon CV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Créons votre CV</h1>
+
+  <form id="cv-form" action="/generer-cv" method="POST" enctype="multipart/form-data">
+
+    <h2>1. Langue du CV</h2>
+    <div class="modeles">
+      <label>
+        <input type="radio" name="langue" value="francais" checked>
+        Français
+      </label>
+      <label>
+        <input type="radio" name="langue" value="anglais">
+        Anglais
+      </label>
+    </div>
+<h2>2. Choisissez un modèle</h2>
+    <div class="modeles">
+      <label>
+        <input type="radio" name="modele" value="classique" checked>
+        Classique
+      </label>
+      <label>
+        <input type="radio" name="modele" value="moderne">
+        Moderne
+      </label>
+      <label>
+        <input type="radio" name="modele" value="creatif">
+        Créatif
+      </label>
+    </div>
+
+    <h2>3. Vos informations personnelles</h2>
+    <label>Nom complet
+      <input type="text" name="nom" required>
+    </label>
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Téléphone
+      <input type="tel" name="telephone">
+    </label>
+    <label>Ville
+      <input type="text" name="ville">
+      <label>Photo de profil (optionnel)
+      <input type="file" name="photo" accept="image/*">
+    </label>
+    <label>Lien LinkedIn (optionnel)
+      <input type="url" name="linkedin" placeholder="https://linkedin.com/in/votre-nom">
+    </label>
+
+    </label>
+
+    <h2>4. Poste visé</h2>
+    <label>Quel poste recherchez-vous ?
+      <input type="text" name="poste" required>
+    </label>
+
+    <h2>5. Profil / À propos de vous</h2>
+    <textarea name="profil" rows="4" placeholder="Décrivez-vous en quelques phrases : qui êtes-vous, ce qui vous motive, vos points forts..."></textarea>
+    
+    <h2>6. Formation</h2>
+    <textarea name="formation" rows="4" placeholder="Ex: Licence, Université de Dschang, 2023-2026"></textarea>
+
+    <h2>7. Expériences professionnelles / stages</h2>
+    <textarea name="experience" rows="5" placeholder="Décrivez vos stages, jobs, projets pertinents..."></textarea>
+
+    <h2>8. Compétences</h2>
+    <textarea name="competences" rows="3" placeholder="Ex: Excel, communication, travail d'équipe..."></textarea>
+
+    <h2>9. Langues</h2>
+    <textarea name="langues" rows="2" placeholder="Ex: Français (natif), Anglais (courant)"></textarea>
+
+    <button type="submit">Générer mon CV</button>
+
+  </form>
+
+</body>
+</html>

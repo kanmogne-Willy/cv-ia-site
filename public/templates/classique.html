@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CV - Modèle Classique</title>
+  <style>
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      color: #222;
+      line-height: 1.5;
+    }
+    .entete {
+      text-align: center;
+      border-bottom: 3px solid #1a1a1a;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .entete-flex {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .photo {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #1a1a1a;
+    }
+    .entete h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+    .entete p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .section {
+      margin-bottom: 22px;
+    }
+    .section h2 {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+    .section p, .section li {
+      font-size: 14px;
+      color: #333;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="entete">
+    <div class="entete-flex">
+      <img src="{{PHOTO}}" alt="Photo de profil" class="photo">
+      <div>
+        <h1>{{NOM}}</h1>
+        <p>Poste visé : {{POSTE}} &nbsp;|&nbsp; {{EMAIL}} &nbsp;|&nbsp; {{TELEPHONE}} &nbsp;|&nbsp; {{VILLE}}</p>
+        <p>LinkedIn : {{LINKEDIN}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Profil</h2>
+    <p>{{PROFIL}}</p>
+  </div>
+
+  <div class="section">
+    <h2>Formation</h2>
+    <p>{{FORMATION}}</p>
+  </div>
+
+  <div class="section">
+    <h2>Expérience</h2>
+    <p>{{EXPERIENCE}}</p>
+  </div>
+
+  <div class="section">
+    <h2>Compétences</h2>
+    <p>{{COMPETENCES}}</p>
+  </div>
+
+  <div class="section">
+    <h2>Langues</h2>
+    <p>{{LANGUES}}</p>
+  </div>
+
+</body>
+</html>
