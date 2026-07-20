@@ -158,11 +158,41 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans 
     await navigateur.close();
     res.download(cheminPdf, nomFichier);
 
-  } catch (erreur) {
+  } } catch (erreur) {
     console.error('Erreur lors de la génération :', erreur);
-    res.status(500).send('Une erreur est survenue lors de la génération du CV.');
+    res.status(500).send(`
+      <h2>Une erreur est survenue lors de la génération de votre CV</h2>
+      <p>Votre paiement a bien été reçu, mais une erreur technique nous empêche de générer votre CV pour le moment.</p>
+      <p>Merci de nous contacter avec votre numéro de transaction pour obtenir votre CV ou un remboursement.</p>
+      <p><a href="/formulaire.html">Retour au formulaire</a></p>
+    `);
   }
+
+function nettoyerVieuxFichiers() {
+  const dossierUploads = path.join(__dirname, 'uploads');
+  const maintenant = Date.now();
+  const uneJournee = 24 * 60 * 60 * 1000;
+
+  fs.readdir(dossierUploads, (err, fichiers) => {
+    if (err) return console.error('Erreur lecture dossier uploads:', err);
+    
+    fichiers.forEach(fichier => {
+      if (fichier === '.gitkeep') return;
+      
+      const cheminFichier = path.join(dossierUploads, fichier);
+      fs.stat(cheminFichier, (err, stats) => {
+        if (err) return;
+        if (maintenant - stats.mtimeMs > uneJournee) {
+          fs.unlink(cheminFichier, (err) => {
+            if (!err) console.log(`Fichier supprimé: ${fichier}`);
+          });
+        }
+      });
+    });
+  });
 }
+
+setInterval(nettoyerVieuxFichiers, 60 * 60 * 1000);
 
 
 app.listen(PORT, () => {
