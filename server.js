@@ -5,6 +5,10 @@ const path = require('path');
 const fs = require('fs');
 const Anthropic = require('@anthropic-ai/sdk');
 const puppeteer = require('puppeteer');
+const fsSync = require('fs');
+if (!fsSync.existsSync('uploads')){
+  fsSync.mkdirSync('uploads');
+  }
 
 const app = express();
 const PORT = 3000;
