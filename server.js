@@ -22,9 +22,78 @@ const upload = multer({ dest: 'uploads/' });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.post('/generer-cv', upload.single('photo'), async (req, res) => {
+const axios = require('axios');
+
+app.post('/demarrer-paiement', upload.single('photo'), async (req, res) => {
   try {
     const donnees = req.body;
+    
+    const sessionId = Date.now().toString();
+    const sessionPath = path.join(__dirname, 'uploads', `session_${sessionId}.json`);
+    
+    const sessionData = {
+      donnees: donnees,
+      photoPath: req.file ? req.file.path : null
+    };
+    fs.writeFileSync(sessionPath, JSON.stringify(sessionData));
+
+    const monetbilData = new URLSearchParams({
+      amount: 500,
+      currency: 'XAF',
+      item_ref: sessionId,
+      payment_ref: sessionId,
+      return_url: `${req.protocol}://${req.get('host')}/paiement-retour?session=${sessionId}`,
+      notify_url: `${req.protocol}://${req.get('host')}/paiement-notification`
+    });
+
+    const response = await axios.post(
+      `https://api.monetbil.com/widget/v2.1/${process.env.MONETBIL_SERVICE_KEY}`,
+      monetbilData
+    );
+
+    if (response.data.success) {
+      res.redirect(response.data.payment_url);
+    } else {
+      res.status(500).send('Erreur lors de la création du paiement.');
+    }
+  } catch (erreur) {
+    console.error('Erreur paiement:', erreur);
+    res.status(500).send('Erreur lors du démarrage du paiement.');
+  }
+});
+app.get('/paiement-retour', async (req, res) => {
+  try {
+    const sessionId = req.query.session;
+    const status = req.query.status;
+
+    if (status !== 'success' && status !== '1') {
+      return res.send('<h2>Paiement annulé ou échoué. <a href="/formulaire.html">Réessayer</a></h2>');
+    }
+
+    const sessionPath = path.join(__dirname, 'uploads', `session_${sessionId}.json`);
+    if (!fs.existsSync(sessionPath)) {
+      return res.status(404).send('Session introuvable ou expirée.');
+    }
+
+    const sessionData = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+    const donnees = sessionData.donnees;
+
+    // On réutilise la logique de génération de CV existante
+    req.body = donnees;
+    req.file = sessionData.photoPath ? { path: sessionData.photoPath } : null;
+    
+    await genererEtEnvoyerCV(req, res, donnees);
+
+    fs.unlinkSync(sessionPath);
+
+  } catch (erreur) {
+    console.error('Erreur retour paiement:', erreur);
+    res.status(500).send('Une erreur est survenue après le paiement.');
+  }
+});
+
+async function genererEtEnvoyerCV(req, res, donnees) {
+  try {
     const modeleChoisi = donnees.modele;
     const langueChoisie = donnees.langue === 'anglais' ? 'anglais' : 'français';
 
@@ -61,7 +130,6 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans 
 
     let photoUrl = 'https://via.placeholder.com/150';
     if (req.file) {
-      // Chemin absolu nécessaire pour que Puppeteer trouve l'image
       photoUrl = 'file://' + path.join(__dirname, req.file.path);
     }
 
@@ -79,7 +147,6 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans 
       .replaceAll('{{COMPETENCES}}', contenuAmeliore.competences || '')
       .replaceAll('{{LANGUES}}', contenuAmeliore.langues || '');
 
-    // ---- GÉNÉRATION DU PDF ----
     const navigateur = await puppeteer.launch();
     const page = await navigateur.newPage();
     await page.setContent(templateHtml, { waitUntil: 'networkidle0' });
@@ -87,22 +154,16 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans 
     const nomFichier = `CV_${(donnees.nom || 'candidat').replace(/\s+/g, '_')}.pdf`;
     const cheminPdf = path.join(__dirname, 'uploads', nomFichier);
 
-    await page.pdf({
-      path: cheminPdf,
-      format: 'A4',
-      printBackground: true,
-    });
-
+    await page.pdf({ path: cheminPdf, format: 'A4', printBackground: true });
     await navigateur.close();
-
-    // Envoie le PDF en téléchargement au client
     res.download(cheminPdf, nomFichier);
 
   } catch (erreur) {
     console.error('Erreur lors de la génération :', erreur);
-    res.status(500).send('Une erreur est survenue lors de la génération du CV. Vérifiez la console du serveur.');
+    res.status(500).send('Une erreur est survenue lors de la génération du CV.');
   }
-});
+}
+
 
 app.listen(PORT, () => {
   console.log(`Le serveur tourne sur http://localhost:${PORT}`);
