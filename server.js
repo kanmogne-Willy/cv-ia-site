@@ -158,7 +158,8 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans 
     await navigateur.close();
     res.download(cheminPdf, nomFichier);
 
-  } } catch (erreur) {
+  } 
+  } catch (erreur) {
     console.error('Erreur lors de la génération :', erreur);
     res.status(500).send(`
       <h2>Une erreur est survenue lors de la génération de votre CV</h2>
